@@ -3,6 +3,7 @@ from pathlib import Path
 
 import mujoco
 from mjlab.actuator import XmlActuatorCfg
+from mjlab_microduck.hl2915 import HL2915_PARAMS, KP_FW as HL2915_KP_FW  # registers "hl2915" in BAM
 from mjlab_microduck.actuator import (
     BacklashEncoderBamActuatorCfg,
     FrictionDRBamActuatorCfg,
@@ -154,22 +155,25 @@ FULL_COLLISION = CollisionCfg(
 # )
 
 # -- BAM M6 actuator (full voltage control + load-dependent friction) --
+# MyMicroDuck: Feetech HL2915 identified on the pendulum bench (see
+# mjlab_microduck/hl2915.py; params from MyMicroDuck docs/29). Pollen's original
+# XL330 config was motor_name="xl330", kp_fw=200, vin_range=(6.5, 8.2), vin_min=6.0.
 # Exclude passive_* joints (jaw linkage in the new model has no XML actuator).
 # Voltage domain randomization (mirrors mjlab_microban):
-#   - vin_range: per-env battery voltage sampled at startup (replaces fixed vin)
+#   - vin_range: per-env battery voltage sampled at startup (replaces fixed vin);
+#     3S lithium, empty to full
 #   - vin_drop_gain_range: load-dependent voltage sag V_drop = gain * sum(|tau|)
-#   - vin_min: hard floor on the effective voltage after sag
-# kp_fw kept at 200 (microduck's preserved firmware stiffness; microban uses 125).
+#   - vin_min: hard floor on the effective voltage after sag (HL2915 9-14 V range)
+# kp_fw = the HLS P coefficient the runtime leaves on the servos (register 21 = 32).
+# The 1.5 A firmware current cap lives inside the hl2915 actuator (no max_current).
+# Delays still XL330-bus values: re-measure on the HL2915 bus.
 _BAM_ACTUATOR_KWARGS = dict(
-    motor_name="xl330",
-    model="m6",
+    json_path=str(HL2915_PARAMS),
     target_names_expr=(r"^(?!passive_).*",),
-    kp_fw=200.0,  # microduck's preserved firmware stiffness (microban uses 125)
-    # vin_range=(6.9, 7.9),
-    vin_range=(6.5, 8.2),
+    kp_fw=HL2915_KP_FW,
+    vin_range=(10.8, 12.6),
     vin_drop_gain_range=(0.0, 0.2),
-    vin_min=6.0,
-    # max_current=1.75,
+    vin_min=9.0,
     delay_min_lag=3,
     delay_max_lag=6,
 )

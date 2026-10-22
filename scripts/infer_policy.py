@@ -31,13 +31,16 @@ MICRODUCK_BALL_XML = "src/mjlab_microduck/robot/microduck/scene_ball.xml"
 # trained against in warp). Not imported from there: that module drags in
 # mjlab/torch/warp (~16 s import) for a CPU rehearsal script. Locked by
 # tests/test_infer_policy_bam.py.
-BAM_MOTOR_NAME = "xl330"
-BAM_MODEL = "m6"
-BAM_KP_FW = 200.0                 # microduck's preserved firmware stiffness
-BAM_VIN_RANGE = (6.5, 8.2)        # per-env battery voltage DR in training
+# MyMicroDuck: HL2915 identified on the bench (mjlab_microduck/hl2915.py, which
+# registers the "hl2915" BAM actuator and is torch-free, so importing it is cheap).
+from mjlab_microduck.hl2915 import HL2915_PARAMS, KP_FW as _HL2915_KP_FW  # noqa: E402
+
+BAM_JSON_PATH = str(HL2915_PARAMS)
+BAM_KP_FW = _HL2915_KP_FW         # HLS P coefficient left on the servos (register 21)
+BAM_VIN_RANGE = (10.8, 12.6)      # per-env battery voltage DR in training (3S lithium)
 BAM_VIN_DROP_GAIN_RANGE = (0.0, 0.2)  # load-dependent sag V_drop = gain * sum|tau|
-BAM_VIN_MIN = 6.0                 # floor on effective voltage after sag
-BAM_MAX_CURRENT = None            # training runs WITHOUT the firmware current limiter
+BAM_VIN_MIN = 9.0                 # floor on effective voltage after sag
+BAM_MAX_CURRENT = None            # the 1.5 A firmware cap is built into the hl2915 actuator
 # Stiff joint-friction constraint, copied from bam.mjlab.BamActuator
 # (stiff_frictionloss=True in training): warp has no noslip solver, so BAM
 # stiffens frictionloss so a statically-held joint does not creep. Mirrored
@@ -47,9 +50,9 @@ BAM_STIFF_SOLIMP_FRICTION = (0.99, 0.9999, 0.001, 0.5, 2.0)
 
 
 def load_bam_model(kp_fw: float, vin: float, max_current):
-    """Build the BAM M6 model + XL330 voltage-controlled actuator."""
+    """Build the BAM M6 model + HL2915 voltage-controlled actuator."""
     from bam.model import load_model
-    bam_model = load_model(motor_name=BAM_MOTOR_NAME, model=BAM_MODEL)
+    bam_model = load_model(BAM_JSON_PATH)
     bam_model.actuator.kp = kp_fw
     bam_model.actuator.vin = vin
     bam_model.actuator.max_current = max_current if (max_current and max_current > 0) else None
@@ -97,7 +100,7 @@ def load_mujoco_with_bam(xml_path: str, bam_model, timestep: float, vin_drop_gai
     data = mujoco.MjData(model)
     bam_ctrl = MujocoController(bam_model, names, model, data,
                                 vin_drop_gain=vin_drop_gain, vin_min=vin_min)
-    print(f"BAM {BAM_MODEL} actuators on {len(names)} joints: kt={kt:.4f} R={R:.4f} "
+    print(f"BAM HL2915 actuators on {len(names)} joints: kt={kt:.4f} R={R:.4f} "
           f"vin={bam_model.actuator.vin:.2f}V kp_fw={bam_model.actuator.kp:.0f} "
           f"vin_drop_gain={vin_drop_gain} vin_min={vin_min} "
           f"max_current={bam_model.actuator.max_current} forcerange=+/-{force_limit:.3f}Nm "
@@ -1200,19 +1203,18 @@ def main():
     parser.add_argument("--no-bam", action="store_true",
                         help="Use the XML MuJoCo position actuators instead of the BAM M6 "
                              "voltage/friction model the policies are trained against.")
-    parser.add_argument("--vin", type=float, default=7.4,
+    parser.add_argument("--vin", type=float, default=11.7,
                         help="BAM battery voltage [V]. Training samples per-env in "
-                             f"{BAM_VIN_RANGE}; 7.4 = nominal 2S LiPo.")
+                             f"{BAM_VIN_RANGE}; 11.7 = middle of that 3S range.")
     parser.add_argument("--vin-drop-gain", type=float, default=0.1,
                         help="BAM load-dependent voltage sag gain [V/Nm], V = vin - gain*sum|tau|. "
                              f"Training samples per-env in {BAM_VIN_DROP_GAIN_RANGE}. 0 disables.")
     parser.add_argument("--kp-fw", type=float, default=BAM_KP_FW,
                         help="BAM firmware P-gain (training uses %(default)s).")
     parser.add_argument("--current-limit", type=float, default=0.0,
-                        help="XL330 firmware current limit [A]. With BAM this is the duty-cycle "
-                             "limiter of the voltage model (as bam models it); with --no-bam the "
-                             "actuator force is clipped to +/- current_limit * kt. Training runs "
-                             "WITHOUT a current limit, so the default is off (<=0).")
+                        help="Firmware current limit [A] for --no-bam only: the actuator force is "
+                             "clipped to +/- current_limit * kt. With BAM the hl2915 actuator already "
+                             "applies the 1.5 A datasheet cap, as in training.")
     parser.add_argument("--foot-friction", type=float, default=None,
                         help="Override the foot sliding friction (mu) to emulate the real grippy "
                              "PU sole. Training used mu~1.0 (range 0.7-1.3); real PU is likely "
@@ -1292,7 +1294,7 @@ def main():
     # controller instead (see load_bam_model). kt comes from the bam package.
     if args.no_bam and args.current_limit and args.current_limit > 0:
         from bam.model import load_model
-        kt = load_model(motor_name="xl330", model="m6").kt.value
+        kt = load_model(BAM_JSON_PATH).kt.value
         torque_limit = kt * args.current_limit
         model.actuator_forcerange[:, 0] = -torque_limit
         model.actuator_forcerange[:, 1] = torque_limit

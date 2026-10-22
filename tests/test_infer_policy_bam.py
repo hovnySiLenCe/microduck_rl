@@ -33,8 +33,7 @@ def test_cpu_bam_constants_mirror_training_cfg(ip):
     from bam.mjlab import BamActuator
     from mjlab_microduck.robot.microduck_constants import _BAM_ACTUATOR_KWARGS as k
 
-    assert ip.BAM_MOTOR_NAME == k["motor_name"]
-    assert ip.BAM_MODEL == k["model"]
+    assert ip.BAM_JSON_PATH == k["json_path"]
     assert ip.BAM_KP_FW == k["kp_fw"]
     assert ip.BAM_VIN_RANGE == k["vin_range"]
     assert ip.BAM_VIN_DROP_GAIN_RANGE == k["vin_drop_gain_range"]
@@ -46,7 +45,7 @@ def test_cpu_bam_constants_mirror_training_cfg(ip):
 
 @pytest.fixture(scope="module")
 def bam_sim(ip):
-    bam_model = ip.load_bam_model(ip.BAM_KP_FW, 7.4, ip.BAM_MAX_CURRENT)
+    bam_model = ip.load_bam_model(ip.BAM_KP_FW, 12.0, ip.BAM_MAX_CURRENT)
     model, data, ctrl, names = ip.load_mujoco_with_bam(
         str(REPO / ip.MICRODUCK_XML), bam_model, 0.005, 0.1, ip.BAM_VIN_MIN
     )
@@ -65,7 +64,7 @@ def test_actuators_converted_like_warp(bam_sim):
     # (set_to_motor leaves the old PD biasprm bytes behind; inert under BIAS_NONE,
     # exactly as in warp's edit_spec.)
     assert (model.actuator_forcelimited == 1).all()
-    assert np.allclose(model.actuator_forcerange[:, 1], 7.4 * kt / R)
+    assert np.allclose(model.actuator_forcerange[:, 1], 12.0 * kt / R)
     dofs = model.jnt_dofadr[model.actuator_trnid[:, 0]]
     assert np.allclose(model.dof_armature[dofs], bam_model.actuator.get_extra_inertia())
     assert np.allclose(model.dof_solref[dofs], ip.BAM_STIFF_SOLREF_FRICTION)
