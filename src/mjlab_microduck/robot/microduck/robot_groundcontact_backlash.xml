@@ -176,18 +176,18 @@
                 <!-- Joint from leg to ankle_left -->
                 <joint axis="0 0 1" name="left_ankle" type="hinge" range="-1.5707963267949063 1.5707963267948868" class="chosen_actuator"/>
                 <joint axis="0 0 1" name="passive_left_ankle_backlash" type="hinge" class="backlash"/>
-                <inertial pos="-0.00615742 -0.0137483 -0.0156585" mass="0.0332562" fullinertia="6.55192e-06 1.23539e-05 8.57325e-06 -2.27457e-07 9.10252e-08 6.28271e-08"/>
+                <inertial pos="-0.00615742 -0.0181483 -0.0156585" mass="0.0332562" fullinertia="6.55192e-06 1.23539e-05 8.57325e-06 -2.27457e-07 9.10252e-08 6.28271e-08"/>
                 <!-- Part sole_left -->
-                <geom type="mesh" class="visual" pos="-0.022 0.00622291 -0.0647" quat="0.5 -0.5 -0.5 -0.5" mesh="sole_left" material="sole_left_material"/>
-                <geom type="mesh" name="left_foot_collision" class="collision" pos="-0.022 0.00622291 -0.0647" quat="0.5 -0.5 -0.5 -0.5" mesh="sole_left" material="sole_left_material"/>
+                <geom type="mesh" class="visual" pos="-0.022 0.00182291 -0.0647" quat="0.5 -0.5 -0.5 -0.5" mesh="sole_left" material="sole_left_material"/>
+                <geom type="mesh" name="left_foot_collision" class="collision" pos="-0.022 0.00182291 -0.0647" quat="0.5 -0.5 -0.5 -0.5" mesh="sole_left" material="sole_left_material"/>
                 <!-- Part foot_left -->
-                <geom type="mesh" class="visual" pos="-0.022 0.00622291 -0.0647" quat="0.5 -0.5 -0.5 -0.5" mesh="foot_left" material="foot_left_material"/>
+                <geom type="mesh" class="visual" pos="-0.022 0.00182291 -0.0647" quat="0.5 -0.5 -0.5 -0.5" mesh="foot_left" material="foot_left_material"/>
                 <!-- Part seeed_bearing__configuration_default -->
                 <geom type="mesh" class="visual" pos="0 0 -0.0322" quat="0 0 0 1" mesh="seeed_bearing__configuration_default" material="seeed_bearing__configuration_default_material"/>
                 <!-- Part ankle_left -->
-                <geom type="mesh" class="visual" pos="-0.022 0.00622291 -0.0647" quat="0.5 -0.5 -0.5 -0.5" mesh="ankle_left" material="ankle_left_material"/>
+                <geom type="mesh" class="visual" pos="-0.022 0.00182291 -0.0647" quat="0.5 -0.5 -0.5 -0.5" mesh="ankle_left" material="ankle_left_material"/>
                 <!-- Frame left_foot -->
-                <site group="3" name="left_foot" pos="-0 -0.0238146 -0.0140852" quat="0 -0 -0.707107 -0.707107"/>
+                <site group="3" name="left_foot" pos="-0 -0.0282146 -0.0140852" quat="0 -0 -0.707107 -0.707107"/>
               </body>
             </body>
           </body>
@@ -342,18 +342,18 @@
                 <!-- Joint from leg_2 to ankle_right -->
                 <joint axis="0 0 1" name="right_ankle" type="hinge" range="-1.5707963267949028 1.5707963267948903" class="chosen_actuator"/>
                 <joint axis="0 0 1" name="passive_right_ankle_backlash" type="hinge" class="backlash"/>
-                <inertial pos="0.00615539 -0.0137482 -0.0156566" mass="0.0335246" fullinertia="6.60478e-06 1.24533e-05 8.64227e-06 2.28756e-07 -9.20786e-08 6.36624e-08"/>
+                <inertial pos="0.00615539 -0.0181482 -0.0156566" mass="0.0335246" fullinertia="6.60478e-06 1.24533e-05 8.64227e-06 2.28756e-07 -9.20786e-08 6.36624e-08"/>
                 <!-- Part ankle_right -->
-                <geom type="mesh" class="visual" pos="0.022 0.00622291 -0.0647" quat="0.5 -0.5 0.5 0.5" mesh="ankle_right" material="ankle_right_material"/>
+                <geom type="mesh" class="visual" pos="0.022 0.00182291 -0.0647" quat="0.5 -0.5 0.5 0.5" mesh="ankle_right" material="ankle_right_material"/>
                 <!-- Part sole_right -->
-                <geom type="mesh" class="visual" pos="0.022 0.00622291 -0.0647" quat="0.5 -0.5 0.5 0.5" mesh="sole_right" material="sole_right_material"/>
-                <geom type="mesh" name="right_foot_collision" class="collision" pos="0.022 0.00622291 -0.0647" quat="0.5 -0.5 0.5 0.5" mesh="sole_right" material="sole_right_material"/>
+                <geom type="mesh" class="visual" pos="0.022 0.00182291 -0.0647" quat="0.5 -0.5 0.5 0.5" mesh="sole_right" material="sole_right_material"/>
+                <geom type="mesh" name="right_foot_collision" class="collision" pos="0.022 0.00182291 -0.0647" quat="0.5 -0.5 0.5 0.5" mesh="sole_right" material="sole_right_material"/>
                 <!-- Part seeed_bearing__configuration_default_3 -->
                 <geom type="mesh" class="visual" pos="0 -0 -0.0292" quat="0 -1 -0 -0" mesh="seeed_bearing__configuration_default" material="seeed_bearing__configuration_default_material"/>
                 <!-- Part foot_right -->
-                <geom type="mesh" class="visual" pos="0.022 0.00622291 -0.0647" quat="0.5 -0.5 0.5 0.5" mesh="foot_right" material="foot_right_material"/>
+                <geom type="mesh" class="visual" pos="0.022 0.00182291 -0.0647" quat="0.5 -0.5 0.5 0.5" mesh="foot_right" material="foot_right_material"/>
                 <!-- Frame right_foot -->
-                <site group="3" name="right_foot" pos="0 -0.0238146 -0.0140852" quat="0.707107 -0.707107 -0 0"/>
+                <site group="3" name="right_foot" pos="0 -0.0282146 -0.0140852" quat="0.707107 -0.707107 -0 0"/>
               </body>
             </body>
           </body>
@@ -362,7 +362,7 @@
     </body>
   </worldbody>
   <asset>
-    <mesh file="leg.stl"/>
+    <mesh name="leg" file="leg_modified.stl"/>
     <mesh file="yaw_roll_motion.stl"/>
     <mesh file="face_part.stl"/>
     <mesh file="upper_leg_rigidity_plate.stl"/>
@@ -371,7 +371,7 @@
     <mesh file="jaw_soft.stl"/>
     <mesh file="neck.stl"/>
     <mesh file="foot_right.stl"/>
-    <mesh file="ankle_left.stl"/>
+    <mesh name="ankle_left" file="ankle_left_modified.stl"/>
     <mesh file="trunk_base.stl"/>
     <mesh file="bearing_roll.stl"/>
     <mesh file="upper_leg_left.stl"/>
@@ -383,14 +383,14 @@
     <mesh file="yaw2roll.stl"/>
     <mesh file="m12_lens_holder.stl"/>
     <mesh file="speaker.stl"/>
-    <mesh file="bottom_head_shell.stl"/>
+    <mesh name="bottom_head_shell" file="bottom_head_shell_modified.stl"/>
     <mesh file="hip_l.stl"/>
     <mesh file="elec_rpi_robot_hat_pcb.stl"/>
     <mesh file="xl330.stl"/>
     <mesh file="lens.stl"/>
     <mesh file="seeed_bearing__configuration_default.stl"/>
-    <mesh file="ankle_right.stl"/>
-    <mesh file="jaw.stl"/>
+    <mesh name="ankle_right" file="ankle_right_modified.stl"/>
+    <mesh name="jaw" file="jaw_modified.stl"/>
     <mesh file="np_f970.stl"/>
     <mesh file="banana_pcb_locker.stl"/>
     <mesh file="upper_leg_right.stl"/>

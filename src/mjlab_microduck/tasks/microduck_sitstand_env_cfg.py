@@ -643,7 +643,7 @@ def make_microduck_sitstand_env_cfg(
     cfg.events["foot_friction"].params["ranges"] = (0.7, 1.3)  # match velocity
 
     # Base reset: standing, just above the measured equilibrium (STAND_Z=0.115).
-    cfg.events["reset_base"].params["pose_range"]["z"] = (0.11, 0.12)
+    cfg.events["reset_base"].params["pose_range"]["z"] = (0.1144, 0.1244)  # +4.4 mm: MyMicroDuck ankle bore raise (legs longer), was (0.11, 0.12)
 
     # Reset-state mix: 50% standing / 50% already seated (SIT keyframe with
     # joint/tilt noise). Combined with the independent 50/50 posture command

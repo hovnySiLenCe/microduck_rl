@@ -495,7 +495,7 @@ def make_microduck_ground_pick_env_cfg(play: bool = False, rough: bool = False) 
     )
     cfg.events["foot_friction"].params["asset_cfg"].geom_names = foot_frictions_geom_names
     cfg.events["foot_friction"].params["ranges"] = (0.7, 1.3)  # match velocity
-    cfg.events["reset_base"].params["pose_range"]["z"] = (0.12, 0.13)
+    cfg.events["reset_base"].params["pose_range"]["z"] = (0.1244, 0.1344)  # +4.4 mm: MyMicroDuck ankle bore raise (legs longer), was (0.12, 0.13)
 
     if ENABLE_VELOCITY_PUSHES:
         # Play : intervalle espacé (2-4 s) pour juger le geste sur un comportement

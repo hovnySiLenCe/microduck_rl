@@ -385,7 +385,7 @@ def make_microduck_velocity_env_cfg(
         params={"sensor_names": (feet_ground_cfg.name,)},
     )
 
-    cfg.events["reset_base"].params["pose_range"]["z"] = (0.12, 0.13)
+    cfg.events["reset_base"].params["pose_range"]["z"] = (0.1244, 0.1344)  # +4.4 mm: MyMicroDuck ankle bore raise (legs longer), was (0.12, 0.13)
 
     # Velocity-based pushes for robustness training
     if ENABLE_VELOCITY_PUSHES:
