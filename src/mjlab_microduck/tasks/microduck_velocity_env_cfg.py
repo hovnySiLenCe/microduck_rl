@@ -190,6 +190,20 @@ def _soften_terrain_contacts(spec: _mujoco.MjSpec) -> None:
     print(f"[rough terrain] spec_fn: softened {count} terrain geoms (solref=0.04)")
 
 
+def _track_yaw_rate_only(env, std, command_name, asset_cfg=SceneEntityCfg("robot")):
+    """Yaw-rate-only angular tracking.
+
+    The stock term also scores roll/pitch rate against a zero command; on the stiff HL2915
+    (Kp 32) that wobble term swamps the yaw signal and the policy never learns to turn.
+    Roll/pitch rate is already penalised by body_ang_vel.
+    """
+    import torch
+    asset = env.scene[asset_cfg.name]
+    cmd = env.command_manager.get_command(command_name)
+    err = torch.square(cmd[:, 2] - asset.data.root_link_ang_vel_b[:, 2])
+    return torch.exp(-err / std**2)
+
+
 def make_microduck_velocity_env_cfg(
     play: bool = False,
     rough: bool = False,
@@ -270,7 +284,9 @@ def make_microduck_velocity_env_cfg(
     # Action configuration
     joint_pos_action = cfg.actions["joint_pos"]
     assert isinstance(joint_pos_action, JointPositionActionCfg)
-    joint_pos_action.scale = 1.0
+    # HL2915 at Kp 32 is ~25x stiffer than the XL330: halve the action range so each
+    # policy step is not a jolt. Deployment model cards must carry action_scale = 0.5.
+    joint_pos_action.scale = 0.5
 
     # === REWARDS ===
     # Pose reward configuration
@@ -339,10 +355,14 @@ def make_microduck_velocity_env_cfg(
     cfg.rewards["angular_momentum"].weight = -0.02
 
     # Velocity tracking rewards
-    cfg.rewards["track_linear_velocity"].weight = 2.0
+    # HL2915: tracking weights 2.0 -> 4.0. At 2.0 the flat exp kernel paid 86% of the
+    # reward for walking at 38% of the command, so the gait stayed slow; raising only the
+    # linear weight opened a slow-turn dead zone, so both are doubled together.
+    cfg.rewards["track_linear_velocity"].weight = 4.0
     cfg.rewards["track_linear_velocity"].params["std"] = math.sqrt(0.1)
-    cfg.rewards["track_angular_velocity"].weight = 2.0
+    cfg.rewards["track_angular_velocity"].weight = 4.0
     cfg.rewards["track_angular_velocity"].params["std"] = math.sqrt(0.5)
+    cfg.rewards["track_angular_velocity"].func = _track_yaw_rate_only
 
     # Action smoothness: stage-0 value; the action_rate_weight curriculum below
     # ramps it -0.1 → -1.0 by iter 1500.
